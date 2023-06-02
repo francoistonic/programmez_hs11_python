@@ -1,0 +1,1219 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2709
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Calibri;\f1\fmodern\fcharset0 CourierNewPSMT;\f2\fmodern\fcharset0 CourierNewPS-BoldMT;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red251\green0\blue7;\red11\green90\blue178;
+\red176\green0\blue4;\red181\green69\blue16;\red37\green95\blue166;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c100000\c0\c0;\cssrgb\c0\c43922\c75294;
+\cssrgb\c75294\c0\c0;\cssrgb\c76863\c34902\c6667;\cssrgb\c18039\c45490\c70980;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\li960\sl313\sa213\partightenfactor0
+
+\f0\fs29\fsmilli14667 \cf2 \expnd0\expndtw0\kerning0
+\'a0\
+\pard\pardeftab720\sl313\sa213\partightenfactor0
+\cf3 \ul \ulc3 Verif-issues.py\ulnone \'a0\cf2 :\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs21\fsmilli10667 \cf2 #####################################################
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # PARAMETRES :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # $1 => Token avec droit API (role =>Reporter)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # $2 => Url git des api des projets
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # $3 => Num\'e9ro d'id du projet gitlab
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 #
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # CODE DE RETOUR :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # 0 => L'ex\'e9cution est r\'e9ussie
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # 1 => Erreur durant l'ex\'e9cution
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 #####################################################
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\b\fs21\fsmilli10667 \cf2 from
+\f1\b0  git 
+\f2\b import
+\f1\b0  Repo
+\fs26\fsmilli13333 \
+
+\f2\b\fs21\fsmilli10667 import
+\f1\b0  os
+\fs26\fsmilli13333 \
+
+\f2\b\fs21\fsmilli10667 import
+\f1\b0  git
+\fs26\fsmilli13333 \
+
+\f2\b\fs21\fsmilli10667 import
+\f1\b0  sys
+\fs26\fsmilli13333 \
+
+\f2\b\fs21\fsmilli10667 import
+\f1\b0  re
+\fs26\fsmilli13333 \
+
+\f2\b\fs21\fsmilli10667 import
+\f1\b0  requests
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\b\fs21\fsmilli10667 \cf2 class
+\f1\b0  
+\f2\b \cf4 CGitlabVerifIssues
+\f1\b0 \cf2 :
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0\'a0\'a0 \cf5 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 class permettant de r\'e9aliser des v\'e9rifications 
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0des issues gitlab lors de merge requ\'eate et de 
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0leurs existence dans l'API gitlab.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 ...
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 Attribus
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 ----------
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 api_key : str
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Token avec droit API (role =>Reporter).
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 url_projet_api : str
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Url git des api des projets.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 id_projet : int
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Num\'e9ro d'id du projet gitlab.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 list_issues : array
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Liste des issues trouvaient dans le titre 
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0de la demande de fusion.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 headers : set
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Contient l'ent\'eate de la requ\'eate avec le token 
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0api utilis\'e9 lors d'une requ\'eate vers l'api gitlab.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0\'a0\'a0 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0 
+\f2\b def
+\f1\b0  
+\f2\b \cf6 __init__
+\f1\b0 \cf2 (self,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 api_key,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 url_projet_api,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 id_projet):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Initialisation des attributs.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Parametres:
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 api_key (int): Token avec droit API (role =>Reporter)
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 url_projet_api (int): Url git des api des projets
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 id_projet (int): Numero d'id du projet gitlab
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.api_key=api_key
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.id_projet=id_projet
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.list_issues=[]
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.headers=\{'PRIVATE-TOKEN': self.api_key\}
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.url_projet_api=url_projet_api
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0 
+\f2\b def
+\f1\b0  
+\f2\b \cf6 Check_issue_merge
+\f1\b0 \cf2 (self):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 V\'e9rifie la pr\'e9sence au minimum d'un num\'e9ro d'issue dans le titre de la merge request.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Retour:
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 0 (int): L'ex\'e9cution est r\'e9ussi
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 1 (int): Erreur durant l'ex\'e9cution
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 regex = re.\cf7 compile\cf2 (\cf5 "#\\\\d+"\cf2 )
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0url = self.url_projet_api + self.id_projet + "\cf5 /merge_requests?state=opened\cf2 "
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (url)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 resp = requests.get(url,headers=self.headers)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b if
+\f1\b0  (resp.status_code == requests.codes.ok):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 list_mr=resp.json()
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b for
+\f1\b0  mr 
+\f2\b in
+\f1\b0  list_mr:
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 title=mr["\cf5 title\cf2 "]
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.list_issues = regex.findall(title)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b if
+\f1\b0  (\cf7 0 \cf2 < \cf7 len\cf2 (self.list_issues)):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (F"\cf5 Merge request title : \{\cf2 title\cf5 \}\cf2 ")
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b return
+\f1\b0  \cf7 0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b else
+\f1\b0 :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (F"\cf5 Error : Issue not find in Title Merge Request !!!\cf2 ")
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (F"\cf5 Merge request title : \{\cf2 title\cf5 \}\cf2 ")
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b return
+\f1\b0  \cf7 1
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b else
+\f1\b0 :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (F"\cf5 Error : When call url = (\{\cf2 url\cf5 \})\cf2 ")
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b return
+\f1\b0  \cf7 1
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b return
+\f1\b0  \cf7 0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0 
+\f2\b def
+\f1\b0  
+\f2\b \cf6 Check_issue_exist
+\f1\b0 \cf2 (self):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 V\'e9rifie si toutes les issues existent bien 
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0dans l'api gitlab du projet.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Retour:
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 0 (int): L'ex\'e9cution est r\'e9ussi
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 1 (int): Erreur durant l'ex\'e9cution
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b for
+\f1\b0  issue 
+\f2\b in
+\f1\b0  ( x[\cf7 1\cf2 :] 
+\f2\b for
+\f1\b0  x 
+\f2\b in
+\f1\b0  self.list_issues ):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 url = self.url_projet_api + self.id_projet + \cf5 "/issues/"\cf2  + issue
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (url)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 resp = requests.get(url,headers=self.headers)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b if
+\f1\b0  (resp.status_code != requests.codes.ok):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 ( F"\cf5 Error : Issue N\'b0 (\{\cf2 issue\cf5 \}) not exist !!!\cf2 ")
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b return
+\f1\b0  \cf7 1
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 ( F"\cf5 Issue N\'b0 (\{\cf2 issue\cf5 \}) find\cf2 ")\'a0\'a0\'a0 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b return
+\f1\b0  \cf7 0
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\b\fs21\fsmilli10667 \cf2 \'a0
+\f1\b0\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 VerifIssues = CGitlabVerifIssues(sys.argv[\cf7 1\cf2 ],
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.argv[\cf7 2\cf2 ],
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.argv[\cf7 3\cf2 ])
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 ret=VerifIssues.Check_issue_merge()
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\b\fs21\fsmilli10667 \cf2 if
+\f1\b0 (ret == \cf7 0\cf2 ):
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0\'a0\'a0 ret=VerifIssues.Check_issue_exist()
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0 
+\f2\b if
+\f1\b0 (ret == \cf7 0\cf2 ):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.\cf7 exit\cf2 (\cf7 0\cf2 )
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0 
+\f2\b else
+\f1\b0 :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.\cf7 exit\cf2 (\cf7 1\cf2 )
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\b\fs21\fsmilli10667 \cf2 else
+\f1\b0 :
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0\'a0\'a0 sys.\cf7 exit\cf2 (\cf7 1\cf2 )
+\fs26\fsmilli13333 \
+\'a0\
+\pard\pardeftab720\sl313\sa213\partightenfactor0
+
+\f0\fs29\fsmilli14667 \cf2 \'a0\
+\pard\pardeftab720\sl313\partightenfactor0
+\cf3 \
+\pard\pardeftab720\sl313\sa213\partightenfactor0
+\cf3 \ul \'a0\cf2 \ulnone \
+\cf3 \ul Create-release-note.py\ulnone \'a0\cf2 :\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs21\fsmilli10667 \cf2 ###################################################################
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # PARAMETRES :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # $1 => Token avec droit API (r\'f4le =>Reporter)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # $2 => Url git des api des projets
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # $3 => Num\'e9ro d'id du projet gitlab
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # $4 => Url gitlab du projet, cela permettra d\'92analyser les commit
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # $5 => Nom de la branche \'e0 traiter
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # #6 => Nom de la version qui apparaitra dans la release note
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 #
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # CODE DE RETOUR :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # 0 => L'ex\'e9cution est r\'e9ussie
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 # 1 => Erreur durant l'ex\'e9cution
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 ###################################################################
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\b\fs21\fsmilli10667 \cf2 from
+\f1\b0  git 
+\f2\b import
+\f1\b0  Repo
+\fs26\fsmilli13333 \
+
+\f2\b\fs21\fsmilli10667 import
+\f1\b0  os
+\fs26\fsmilli13333 \
+
+\f2\b\fs21\fsmilli10667 import
+\f1\b0  git
+\fs26\fsmilli13333 \
+
+\f2\b\fs21\fsmilli10667 import
+\f1\b0  sys
+\fs26\fsmilli13333 \
+
+\f2\b\fs21\fsmilli10667 import
+\f1\b0  re
+\fs26\fsmilli13333 \
+
+\f2\b\fs21\fsmilli10667 import
+\f1\b0  requests
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\b\fs21\fsmilli10667 \cf2 class
+\f1\b0  
+\f2\b \cf4 CGitlabReleaseNote
+\f1\b0 \cf2 :
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0\'a0\'a0 \cf5 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 class permettant de r\'e9aliser des v\'e9rifications d'issues gitlab 
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0lors de merge request et de leurs existence dans l'API gitlab.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 ...
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 Attribus
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 ----------
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 api_key : str
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Token avec droit API (role =>Reporter).
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 url_projet_api : str
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Url git des api des projets.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 id_projet : int
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Numero d'id du projet gitlab.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 repo : git.Repo
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Represante une copie du repositories du projets git
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 log : git.refs.log.RefLog
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Contient les logs des commits li\'e9 au repo.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 list_issues : array
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Liste des issues trouvaient dans le titre des merges request.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 release_name : str
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Nom de la version qui apparaitra dans la release note
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0\'a0\'a0 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0
+\f2\b def
+\f1\b0  
+\f2\b \cf6 __init__
+\f1\b0 \cf2 (self,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 api_key,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 url_projet_api,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 id_projet,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 url,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 branch_name,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 release_name):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Initialisation des attributs.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Param\'e8tres :
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 api_key (int): Token avec droit API (role =>Reporter)
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 url_projet_api (int): Url git des api des projets
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 id_projet (int): Numero d'id du projet gitlab
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 url (str): Url gitlab du projet, cela permettra d\'92analyser les commit
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 branch_name (str): Nom de la branche \'e0 traiter
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 release_name (str): Nom de la version qui apparaitra dans la release note
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.repo = git.Repo.clone_from(url, os.path.join(\cf5 "test"\cf2 , 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\cf5 "/home/devops/test"\cf2 ), 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0branch=branch_name)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.log = \cf7 eval\cf2 (\cf5 "self.repo.heads.%s.log()"\cf2  %(branch_name))
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.list_issues=[]
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0 \'a0\'a0\'a0\'a0\'a0\'a0self.api_key=api_key
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.release_name=release_name
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.id_projet=id_projet
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.url_projet_api=url_projet_api
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0 
+\f2\b def
+\f1\b0  
+\f2\b \cf6 __print_commit
+\f1\b0 \cf2 (self,commit):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 ('----')
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (\cf7 str\cf2 (commit.hexsha))
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (\cf5 "\\"\{\}\\" by \{\} (\{\})"\cf2 .\cf7 format\cf2 (commit.summary,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 commit.message,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 commit.author.name,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 commit.author.email))
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (\cf7 str\cf2 (commit.authored_datetime))
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (\cf7 str\cf2 (\cf5 "count: \{\} and size: \{\}"\cf2 .\cf7 format\cf2 (commit.count(),
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 commit.size)))
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0 
+\f2\b def
+\f1\b0  
+\f2\b \cf6 Recovery_commits_issue
+\f1\b0 \cf2 (self):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 R\'e9cup\'e8re tous les commit de merge en interrogant l'API Gitlab
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 et un cr\'e9er un tableau contenant pour chaque issue (id,label,titre).
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 Retour:
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 0 (int): L'ex\'e9cution est r\'e9ussi
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 1 (int): Erreur durant l'ex\'e9cution
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0 \'a0\'a0\'a0\'a0\'a0\'a0"""
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0l_commits_issue=[]
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 last_commit_number=self.log[-1].newhexsha[\cf7 0\cf2 :\cf7 8\cf2 ]
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 regex = re.\cf7 compile\cf2 (\cf5 "#\\\\d+"\cf2 )
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 commits = \cf7 list\cf2 (self.repo.iter_commits(last_commit_number + 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\cf5 '^1..'\cf2  + last_commit_number + 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\cf5 '^2'\cf2 ))
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b for
+\f1\b0  commit in commits:
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.__print_commit(commit)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 resultats = regex.findall(commit.message)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 l_commits_issue += [ resultat[1:] for resultat in resultats ]
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (\cf5 "List commit with issues number : "\cf2 + \cf5 ", "\cf2 .join(l_commits_issue))
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 headers=\{\cf5 'PRIVATE-TOKEN'\cf2 : self.api_key\}
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b for
+\f1\b0  issue in l_commits_issue:
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 url = self.url_projet_api + self.id_projet + "\cf5 /issues/\cf2 " + issue
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (url)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 resp = requests.get(url,headers=headers)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b if
+\f1\b0  (resp.status_code == requests.codes.ok):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 l_resp = resp.json()
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 iid=l_resp[\cf5 "iid"\cf2 ]
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 title=l_resp[\cf5 "title"\cf2 ]
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b for
+\f1\b0  label 
+\f2\b in
+\f1\b0  l_resp[\cf5 "labels"\cf2 ]:
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b if
+\f1\b0  \cf5 "release"\cf2  
+\f2\b in
+\f1\b0  label.lower() :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0 label_release= label.replace(\cf5 'Release::'\cf2 ,\cf5 ''\cf2 ).replace(\cf5 'release::'\cf2 ,\cf5 ''\cf2 )
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b break
+\f1\b0\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b if
+\f1\b0  (label_release != ''):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.list_issues.append(\cf5 "%s:%s:%s"\cf2  %( iid, 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0label_release, 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0title))
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b else
+\f1\b0 :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 print( F\cf5 "Error : Not label find in issue (\{\cf2 iid\cf5 \})\cf2 ")
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 return 1
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b else
+\f1\b0 :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 print( F"\cf5 Error : Issue not found (\{\cf2 iid\cf5 \})\cf2 ")
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 print( F"\cf5 Status code : (\{\cf2 resp.status_code\cf5 \})\cf2 ")
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 return \cf7 1
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (self.list_issues)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b return
+\f1\b0  \cf7 0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0
+\f2\b def
+\f1\b0  
+\f2\b \cf6 Create_release_note
+\f1\b0 \cf2 (self):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Cr\'e9er un fichier Release-note.txt contenant par label toutes
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 les issues associ\'e9s.
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 Retour:
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 0 (int): L'ex\'e9cution est r\'e9ussi
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 1 (int): Erreur durant l'ex\'e9cution
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \cf5 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 """
+\fs26\fsmilli13333 \cf2 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 l_labels_release=[\cf5 'Added'\cf2 ,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 'Changed'\cf2 ,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 'Fixed'\cf2 ,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 'Removed'\cf2 ,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 'Deprecated'\cf2 ,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 'Security'\cf2 ]
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 size_release_name=\cf7 len\cf2 (\cf5 "Release Name : "\cf2 + self.release_name)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b with
+\f1\b0  \cf7 open\cf2 (\cf5 "Release-note.txt"\cf2 , "a") 
+\f2\b as
+\f1\b0  fichier:
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (\'a0 \cf5 "#"\cf2  * (\cf7 30\cf2 +size_release_name), \cf7 file\cf2 =fichier)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 (\'a0 \cf5 "#"\cf2 ,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 " "\cf2  * \cf7 14\cf2 ,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 "Release Name : "\cf2 ,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 self.release_name,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 " "\cf2  * \cf7 14\cf2 ,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf5 "#"\cf2 ,
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 sep='',
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 \cf7 file\cf2 =fichier)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 ( \cf5 "#"\cf2  * (\cf7 30\cf2 +size_release_name), end=\cf5 "\\n\\n"\cf2 , file=fichier)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 ( \cf5 "Description of delivery :"\cf2 , end=\cf5 "\\n\\n"\cf2 , file=fichier)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 issues = \cf7 set\cf2 ( issue.split(\cf5 ':'\cf2 )[1] for issue in self.list_issues )
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b for
+\f1\b0  label_release in l_labels_release:
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b if
+\f1\b0  label_release 
+\f2\b in
+\f1\b0  issues:
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 ( F\cf5 "[\{\cf2 label_release\cf5 \}] :"\cf2 , \cf7 file\cf2 =fichier)
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b for
+\f1\b0  issue 
+\f2\b in
+\f1\b0  self.list_issues:
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 x, y, z=issue.split(':')
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b if
+\f1\b0 (y == label_release):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b print
+\f1\b0 ( F\cf5 "\\t\{\cf2 x\cf5 \}: \{\cf2 z\cf5 \}\cf2 ", \cf7 file\cf2 =fichier )
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0
+\f2\b with
+\f1\b0  \cf7 open\cf2 (\cf5 "Release-note.txt"\cf2 , "r") 
+\f2\b as
+\f1\b0  fichier:
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 print(fichier.read())
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 
+\f2\b return
+\f1\b0  \cf7 0
+\fs26\fsmilli13333 \cf2 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 ReleaseNote = CGitlabReleaseNote(sys.argv[\cf7 1\cf2 ],
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.argv[\cf7 2\cf2 ],
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.argv[\cf7 3\cf2 ],
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.argv[\cf7 4\cf2 ],
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.argv[\cf7 5\cf2 ],
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.argv[\cf7 6\cf2 ])
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 ret=ReleaseNote.Recovery_commits_issue()
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\b\fs21\fsmilli10667 \cf2 if
+\f1\b0 (ret == \cf7 0\cf2 ):
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0\'a0\'a0 ret=ReleaseNote.Create_release_note()
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0 
+\f2\b if
+\f1\b0 (ret == \cf7 0\cf2 ):
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.\cf7 exit\cf2 (\cf7 0\cf2 )
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0 
+\f2\b else
+\f1\b0 :
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 sys.\cf7 exit\cf2 (\cf7 1\cf2 )
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\f2\b\fs21\fsmilli10667 \cf2 else
+\f1\b0 :
+\fs26\fsmilli13333 \
+\pard\pardeftab720\partightenfactor0
+
+\fs21\fsmilli10667 \cf2 \'a0\'a0\'a0 sys.\cf7 exit\cf2 (\cf7 1\cf2 ) 
+\fs26\fsmilli13333 \
+
+\fs21\fsmilli10667 \'a0
+\fs26\fsmilli13333 \
+\pard\pardeftab720\sl313\sa213\partightenfactor0
+
+\f0\fs29\fsmilli14667 \cf2 \'a0\
+\'a0\
+}
